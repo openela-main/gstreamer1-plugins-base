@@ -1,0 +1,42 @@
+From 303c62f25d9d8361f62c1eb00655efb6c4e89f21 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Thu, 22 Feb 2018 11:37:07 +0100
+Subject: [PATCH 2/2] video: disable ORC_RESTRICT
+
+We pass the same pointers to the video_chroma_up,
+video_chroma_down fnd video_convert unctions, which causes the
+compiler to complain.
+---
+ gst-libs/gst/video/video-chroma.c    | 2 ++
+ gst-libs/gst/video/video-converter.c | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/gst-libs/gst/video/video-chroma.c b/gst-libs/gst/video/video-chroma.c
+index b994658a9..0cba36838 100644
+--- a/gst-libs/gst/video/video-chroma.c
++++ b/gst-libs/gst/video/video-chroma.c
+@@ -24,6 +24,8 @@
+ #include <string.h>
+ #include <stdio.h>
+ 
++#define ORC_RESTRICT
++
+ #include "video-orc.h"
+ #include "video-format.h"
+ 
+diff --git a/gst-libs/gst/video/video-converter.c b/gst-libs/gst/video/video-converter.c
+index 31e866a79..03c23a56f 100644
+--- a/gst-libs/gst/video/video-converter.c
++++ b/gst-libs/gst/video/video-converter.c
+@@ -29,6 +29,8 @@
+ #endif
+ #endif
+ 
++#define ORC_RESTRICT
++
+ #include "video-converter.h"
+ 
+ #include <glib.h>
+-- 
+2.14.3
+
