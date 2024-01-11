@@ -5,8 +5,8 @@
 #global shortcommit %(c=%{gitcommit}; echo ${c:0:5})
 
 Name:           gstreamer1-plugins-base
-Version:        1.18.4
-Release:        5%{?gitcommit:.git%{shortcommit}}%{?dist}
+Version:        1.22.1
+Release:        1%{?gitcommit:.git%{shortcommit}}%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPLv2+
@@ -48,6 +48,8 @@ BuildRequires:  mesa-libGL-devel
 BuildRequires:  mesa-libGLES-devel
 BuildRequires:  mesa-libGLU-devel
 BuildRequires:  mesa-libEGL-devel
+BuildRequires:  mesa-libgbm-devel
+BuildRequires:  libgudev-devel
 BuildRequires:  wayland-devel
 BuildRequires:  egl-wayland-devel
 BuildRequires:  graphene-devel
@@ -122,8 +124,8 @@ for the GStreamer Base Plugins library.
 %meson \
   -D package-name='Fedora GStreamer-plugins-base package' \
   -D package-origin='http://download.fedoraproject.org' \
+  -D gl_winsys=wayland,x11,gbm \
   -D doc=disabled \
-  -D gtk_doc=disabled \
   -D orc=enabled \
   -D tremor=disabled \
   -D tests=disabled \
@@ -198,7 +200,6 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgstaudio-1.0.so.*
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstapp.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstencoding.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstrawparse.so
-chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstvideoscale.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstplayback.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgstriff-1.0.so.*
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstxvimagesink.so
@@ -207,7 +208,7 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgsttypefin
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstaudioresample.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstaudioconvert.so
-chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstvideoconvert.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstvideoconvertscale.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstvideorate.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstaudiotestsrc.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstadder.so
@@ -221,7 +222,7 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 
 %files -f gst-plugins-base-%{majorminor}.lang
 %license COPYING
-%doc AUTHORS README REQUIREMENTS
+%doc AUTHORS NEWS README.md README.static-linking RELEASE REQUIREMENTS
 %{_datadir}/appdata/*.appdata.xml
 %{_libdir}/libgstallocators-%{majorminor}.so.*
 %{_libdir}/libgstaudio-%{majorminor}.so.*
@@ -269,9 +270,8 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %{_libdir}/gstreamer-%{majorminor}/libgstsubparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttcp.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttypefindfunctions.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvideoconvert.so
+%{_libdir}/gstreamer-%{majorminor}/libgstvideoconvertscale.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvideorate.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvideoscale.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvideotestsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvolume.so
 
@@ -409,6 +409,7 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %{_includedir}/gstreamer-%{majorminor}/gst/video/colorbalancechannel.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/gstvideoaffinetransformationmeta.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/gstvideoaggregator.h
+%{_includedir}/gstreamer-%{majorminor}/gst/video/gstvideocodecalphameta.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/gstvideodecoder.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/gstvideoencoder.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/gstvideofilter.h
@@ -433,6 +434,7 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-info.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-multiview.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-resampler.h
+%{_includedir}/gstreamer-%{majorminor}/gst/video/video-sei.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-scaler.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-tile.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video.h
@@ -481,6 +483,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Wed Apr 12 2021 Wim Taymans <wtaymans@redhat.com> - 1.22.1-1
+- Update to 1.22.1
+- Resolves: rhbz#2144557
+
 * Fri Jan 14 2022 Wim Taymans <wtaymans@redhat.com> - 1.18.4-5
 - Handle both compressed and uncompressed man pages
 - Fix build with small patch
