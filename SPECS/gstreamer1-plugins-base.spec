@@ -6,7 +6,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.22.1
-Release:        1%{?gitcommit:.git%{shortcommit}}%{?dist}
+Release:        2%{?gitcommit:.git%{shortcommit}}%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPLv2+
@@ -21,6 +21,8 @@ Source0:        http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugin
 Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
 
 Patch1:	        xdg-compile.patch
+Patch2:		0001-subparse-Look-for-the-closing-of-a-tag-after-the-ope.patch
+Patch3:		0002-subparse-Skip-after-the-end-of-a-valid-closing-tag-i.patch
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
@@ -119,6 +121,8 @@ for the GStreamer Base Plugins library.
 %setup -q -n gst-plugins-base-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p3
+%patch3 -p3
 
 %build
 %meson \
@@ -483,6 +487,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Wed Jan 17 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.1-2
+- CVE-2023-37328: heap overwrite in subtitle parsing
+- Resolves: RHEL-19475
+
 * Wed Apr 12 2021 Wim Taymans <wtaymans@redhat.com> - 1.22.1-1
 - Update to 1.22.1
 - Resolves: rhbz#2144557
