@@ -6,7 +6,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.16.1
-Release:        3%{?gitcommit:.git%{shortcommit}}%{?dist}
+Release:        4%{?gitcommit:.git%{shortcommit}}%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPLv2+
@@ -22,6 +22,7 @@ Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
 Patch1:         0002-video-disable-ORC_RESTRICT.patch
 Patch2:		0001-subparse-Look-for-the-closing-of-a-tag-after-the-ope.patch
 Patch3:		0002-subparse-Skip-after-the-end-of-a-valid-closing-tag-i.patch
+Patch4:		0001-exiftag-Prevent-integer-overflows-and-out-of-bounds-.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  gstreamer1-devel >= %{version}
@@ -120,6 +121,7 @@ for the GStreamer Base Plugins library.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 # die rpath (method of modifying libtool fails here)
@@ -487,6 +489,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 
 
 %changelog
+* Fri Nov 08 2024 Wim Taymans <wtaymans@redhat.com> - 1.16.1-4
+- CVE-2024-4453 gstreamer1: EXIF Metadata Parsing Integer Overflow
+- Resolves: RHEL-38509
+
 * Wed Jan 17 2024 Wim Taymans <wtaymans@redhat.com> - 1.16.1-3
 - CVE-2023-37328 gstreamer1-plugins-base: heap overwrite in subtitle parsing
 - Resolves: RHEL-19472
