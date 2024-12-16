@@ -1,7 +1,7 @@
 From 997e8b0a485a22a9e44d503d7a1c6aa1970061e0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
 Date: Tue, 13 Jun 2023 12:58:26 +0300
-Subject: [PATCH 2/2] subparse: Skip after the end of a valid closing tag
+Subject: [PATCH 4/8] subparse: Skip after the end of a valid closing tag
  instead of only skipping `<`
 
 This is a small optimization and avoids restarting the next parsing
@@ -29,5 +29,5 @@ index d0960a971a..b33ddbb2a7 100644
        }
      }
 -- 
-2.43.0
+2.47.0
 

@@ -1,7 +1,7 @@
 From f7f24aed62178dc1deb581a512029dcb20727137 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
 Date: Tue, 13 Jun 2023 12:53:13 +0300
-Subject: [PATCH 1/2] subparse: Look for the closing `>` of a tag after the
+Subject: [PATCH 3/8] subparse: Look for the closing `>` of a tag after the
  opening `<`
 
 Previously when fixing up subrip markip, we were looking from the start
@@ -32,5 +32,5 @@ index 7aa922cdd8..d0960a971a 100644
          const gchar *last = NULL;
          if (num_open_tags > 0)
 -- 
-2.43.0
+2.47.0
 

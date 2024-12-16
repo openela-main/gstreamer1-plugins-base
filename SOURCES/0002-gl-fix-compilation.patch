@@ -1,0 +1,25 @@
+From 2ede3bc75535b7445db836fdcb6a6c85c5f47dbe Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Wed, 17 Jan 2024 16:20:46 +0100
+Subject: [PATCH 2/8] gl: fix compilation
+
+---
+ .../gst-libs/gst/gl/wayland/gstglwindow_wayland_egl.h           | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/subprojects/gst-plugins-base/gst-libs/gst/gl/wayland/gstglwindow_wayland_egl.h b/subprojects/gst-plugins-base/gst-libs/gst/gl/wayland/gstglwindow_wayland_egl.h
+index 0212744b74..58299473d9 100644
+--- a/subprojects/gst-plugins-base/gst-libs/gst/gl/wayland/gstglwindow_wayland_egl.h
++++ b/subprojects/gst-plugins-base/gst-libs/gst/gl/wayland/gstglwindow_wayland_egl.h
+@@ -22,7 +22,7 @@
+ #define __GST_GL_WINDOW_WAYLAND_EGL_H__
+ 
+ #include <wayland-client.h>
+-#include "xdg-shell-client-protocol.h"
++#include "../xdg-shell-client-protocol.h"
+ #include <wayland-egl.h>
+ #include <wayland-cursor.h>
+ 
+-- 
+2.47.0
+

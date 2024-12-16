@@ -6,7 +6,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.22.1
-Release:        2%{?gitcommit:.git%{shortcommit}}%{?dist}
+Release:        3%{?gitcommit:.git%{shortcommit}}%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPLv2+
@@ -18,11 +18,14 @@ Source0:        gst-plugins-base-%{version}.tar.xz
 %else
 Source0:        http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-%{version}.tar.xz
 %endif
-Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
-
-Patch1:	        xdg-compile.patch
-Patch2:		0001-subparse-Look-for-the-closing-of-a-tag-after-the-ope.patch
-Patch3:		0002-subparse-Skip-after-the-end-of-a-valid-closing-tag-i.patch
+Patch0:		0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
+Patch1:		0002-gl-fix-compilation.patch
+Patch2:		0003-subparse-Look-for-the-closing-of-a-tag-after-the-ope.patch
+Patch3:		0004-subparse-Skip-after-the-end-of-a-valid-closing-tag-i.patch
+Patch4:		0005-tags-Don-t-allow-image-tags-with-G_MAXUINT32-length.patch
+Patch5:		0006-opusdec-Set-at-most-64-channels-to-NONE-position.patch
+Patch6:		0007-vorbis_parse-check-writes-to-GstOggStream.vorbis_mod.patch
+Patch7:		0008-vorbisdec-Set-at-most-64-channels-to-NONE-position.patch
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
@@ -119,10 +122,14 @@ for the GStreamer Base Plugins library.
 
 %prep
 %setup -q -n gst-plugins-base-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch0 -p3
+%patch1 -p3
 %patch2 -p3
 %patch3 -p3
+%patch4 -p3
+%patch5 -p3
+%patch6 -p3
+%patch7 -p3
 
 %build
 %meson \
@@ -487,6 +494,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Mon Dec 16 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.1-3
+- Fixes for CVE-2024-47538, CVE-2024-47607, CVE-2024-47615
+  Resolves: RHEL-70979, RHEL-71015, RHEL-70991
+
 * Wed Jan 17 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.1-2
 - CVE-2023-37328: heap overwrite in subtitle parsing
 - Resolves: RHEL-19475
