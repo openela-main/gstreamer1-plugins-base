@@ -1,8 +1,8 @@
 From 58deb2c68fda0cf46a03643aefa28efdc0753efa Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Fri, 8 Nov 2024 10:45:07 +0100
-Subject: [PATCH] exiftag: Prevent integer overflows and out of bounds reads
- when handling undefined tags
+Subject: [PATCH 5/8] exiftag: Prevent integer overflows and out of bounds
+ reads when handling undefined tags
 
 Fixes ZDI-CAN-23896
 Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3483

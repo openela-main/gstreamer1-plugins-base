@@ -1,0 +1,37 @@
+From 0cd2cd6ffe7e5c2dc11cebf56aef39b23103c9aa Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Mon, 16 Dec 2024 11:24:39 +0100
+Subject: [PATCH 6/8] opusdec: Set at most 64 channels to NONE position
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-116
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3871
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8096>
+---
+ ext/opus/gstopusdec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ext/opus/gstopusdec.c b/ext/opus/gstopusdec.c
+index 7ff9bee2e..16b2a2932 100644
+--- a/ext/opus/gstopusdec.c
++++ b/ext/opus/gstopusdec.c
+@@ -369,12 +369,12 @@ gst_opus_dec_parse_header (GstOpusDec * dec, GstBuffer * buf)
+         posn = gst_opus_channel_positions[dec->n_channels - 1];
+         break;
+       default:{
+-        gint i;
++        guint i, max_pos = MIN (dec->n_channels, 64);
+ 
+         GST_ELEMENT_WARNING (GST_ELEMENT (dec), STREAM, DECODE,
+             (NULL), ("Using NONE channel layout for more than 8 channels"));
+ 
+-        for (i = 0; i < dec->n_channels; i++)
++        for (i = 0; i < max_pos; i++)
+           pos[i] = GST_AUDIO_CHANNEL_POSITION_NONE;
+ 
+         posn = pos;
+-- 
+2.47.0
+

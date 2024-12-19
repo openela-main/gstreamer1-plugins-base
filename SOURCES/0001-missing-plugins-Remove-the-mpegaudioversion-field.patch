@@ -1,7 +1,7 @@
-From 06ca82cad9898f5df40011fe0614ee1dfd89f1ae Mon Sep 17 00:00:00 2001
+From d4f28912bad1748afffec840b9330dcd054f5981 Mon Sep 17 00:00:00 2001
 From: Bastien Nocera <hadess@hadess.net>
 Date: Fri, 3 Aug 2012 17:50:24 +0100
-Subject: [PATCH 1/2] missing-plugins: Remove the mpegaudioversion field
+Subject: [PATCH 1/8] missing-plugins: Remove the mpegaudioversion field
 
 From missing plugins requests as it's a duplicate of mpegversion
 and its presence would break codec discovery when using RPM.
@@ -26,5 +26,5 @@ index a08803b18..cdce4bf05 100644
    return ret;
  }
 -- 
-2.14.3
+2.47.0
 

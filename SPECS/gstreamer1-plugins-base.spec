@@ -6,7 +6,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.16.1
-Release:        4%{?gitcommit:.git%{shortcommit}}%{?dist}
+Release:        5%{?gitcommit:.git%{shortcommit}}%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPLv2+
@@ -18,11 +18,14 @@ Source0:        gst-plugins-base-%{version}.tar.xz
 %else
 Source0:        http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-%{version}.tar.xz
 %endif
-Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
-Patch1:         0002-video-disable-ORC_RESTRICT.patch
-Patch2:		0001-subparse-Look-for-the-closing-of-a-tag-after-the-ope.patch
-Patch3:		0002-subparse-Skip-after-the-end-of-a-valid-closing-tag-i.patch
-Patch4:		0001-exiftag-Prevent-integer-overflows-and-out-of-bounds-.patch
+Patch0:		0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
+Patch1:		0002-video-disable-ORC_RESTRICT.patch
+Patch2:		0003-subparse-Look-for-the-closing-of-a-tag-after-the-ope.patch
+Patch3:		0004-subparse-Skip-after-the-end-of-a-valid-closing-tag-i.patch
+Patch4:		0005-exiftag-Prevent-integer-overflows-and-out-of-bounds-.patch
+Patch5:		0006-opusdec-Set-at-most-64-channels-to-NONE-position.patch
+Patch6:		0007-vorbis_parse-check-writes-to-GstOggStream.vorbis_mod.patch
+Patch7:		0008-vorbisdec-Set-at-most-64-channels-to-NONE-position.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  gstreamer1-devel >= %{version}
@@ -122,6 +125,9 @@ for the GStreamer Base Plugins library.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
 
 %build
 # die rpath (method of modifying libtool fails here)
@@ -489,6 +495,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 
 
 %changelog
+* Mon Dec 16 2024 Wim Taymans <wtaymans@redhat.com> - 1.16.1-5
+- Fixes for CVE-2024-47538, CVE-2024-47607, CVE-2024-47615
+  Resolves: RHEL-70974, RHEL-71010, RHEL-70986
+
 * Fri Nov 08 2024 Wim Taymans <wtaymans@redhat.com> - 1.16.1-4
 - CVE-2024-4453 gstreamer1: EXIF Metadata Parsing Integer Overflow
 - Resolves: RHEL-38509

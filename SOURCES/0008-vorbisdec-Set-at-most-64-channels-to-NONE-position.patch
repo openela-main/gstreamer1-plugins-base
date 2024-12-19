@@ -1,0 +1,31 @@
+From 58375a492ee3b28e6e7f3d0be0f4bd9ec861a8cf Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Mon, 16 Dec 2024 11:27:39 +0100
+Subject: [PATCH 8/8] vorbisdec: Set at most 64 channels to NONE position
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-115
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3869
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8101>
+---
+ ext/vorbis/gstvorbisdec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/vorbis/gstvorbisdec.c b/ext/vorbis/gstvorbisdec.c
+index a0b48b71b..b44398945 100644
+--- a/ext/vorbis/gstvorbisdec.c
++++ b/ext/vorbis/gstvorbisdec.c
+@@ -191,7 +191,7 @@ vorbis_handle_identification_packet (GstVorbisDec * vd)
+     }
+     default:{
+       GstAudioChannelPosition position[64];
+-      gint i, max_pos = MAX (vd->vi.channels, 64);
++      gint i, max_pos = MIN (vd->vi.channels, 64);
+ 
+       GST_ELEMENT_WARNING (vd, STREAM, DECODE,
+           (NULL), ("Using NONE channel layout for more than 8 channels"));
+-- 
+2.47.0
+
