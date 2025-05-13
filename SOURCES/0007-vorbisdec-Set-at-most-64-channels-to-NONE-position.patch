@@ -1,7 +1,7 @@
-From 60cd489c12b46b63c6e6b95e24cacd53fef739ef Mon Sep 17 00:00:00 2001
+From dafd5895149f29528342ddecd7ef210dd5597421 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
 Date: Mon, 30 Sep 2024 21:35:07 +0300
-Subject: [PATCH 8/8] vorbisdec: Set at most 64 channels to NONE position
+Subject: [PATCH 07/10] vorbisdec: Set at most 64 channels to NONE position
 
 Thanks to Antonio Morales for finding and reporting the issue.
 

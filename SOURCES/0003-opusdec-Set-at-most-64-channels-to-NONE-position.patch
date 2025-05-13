@@ -1,7 +1,7 @@
-From 854ad98510462c560ede6539157ce53bebdebf15 Mon Sep 17 00:00:00 2001
+From 5e45367c3abc0b5b6e391bc7ec959bb486d636b8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
 Date: Tue, 1 Oct 2024 13:22:50 +0300
-Subject: [PATCH 6/8] opusdec: Set at most 64 channels to NONE position
+Subject: [PATCH 03/10] opusdec: Set at most 64 channels to NONE position
 
 Thanks to Antonio Morales for finding and reporting the issue.
 

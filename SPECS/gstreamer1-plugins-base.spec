@@ -1,3 +1,6 @@
+%bcond cdparanoia %{undefined rhel}
+%bcond libvisual %{undefined rhel}
+
 %global         majorminor      1.0
 
 #global gitrel     140
@@ -5,11 +8,11 @@
 #global shortcommit %(c=%{gitcommit}; echo ${c:0:5})
 
 Name:           gstreamer1-plugins-base
-Version:        1.22.1
-Release:        3%{?gitcommit:.git%{shortcommit}}%{?dist}
+Version:        1.22.12
+Release:        4%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            http://gstreamer.freedesktop.org/
 %if 0%{?gitrel}
 # git clone git://anongit.freedesktop.org/gstreamer/gst-plugins-base
@@ -18,14 +21,18 @@ Source0:        gst-plugins-base-%{version}.tar.xz
 %else
 Source0:        http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-%{version}.tar.xz
 %endif
-Patch0:		0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
-Patch1:		0002-gl-fix-compilation.patch
-Patch2:		0003-subparse-Look-for-the-closing-of-a-tag-after-the-ope.patch
-Patch3:		0004-subparse-Skip-after-the-end-of-a-valid-closing-tag-i.patch
-Patch4:		0005-tags-Don-t-allow-image-tags-with-G_MAXUINT32-length.patch
-Patch5:		0006-opusdec-Set-at-most-64-channels-to-NONE-position.patch
-Patch6:		0007-vorbis_parse-check-writes-to-GstOggStream.vorbis_mod.patch
-Patch7:		0008-vorbisdec-Set-at-most-64-channels-to-NONE-position.patch
+Patch000:       0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
+Patch001:       xdg-compile.patch
+Patch002:	0002-id3v2-Don-t-try-parsing-extended-header-if-not-enoug.patch
+Patch003:	0003-opusdec-Set-at-most-64-channels-to-NONE-position.patch
+Patch004:	0004-vorbis_parse-check-writes-to-GstOggStream.vorbis_mod.patch
+Patch005:	0005-oggstream-review-and-fix-per-format-min_packet_size.patch
+Patch006:	0006-discoverer-Don-t-print-channel-layout-for-more-than-.patch
+Patch007:	0007-vorbisdec-Set-at-most-64-channels-to-NONE-position.patch
+Patch008:	0008-ssaparse-Search-for-closing-brace-after-opening-brac.patch
+Patch009:	0009-ssaparse-Don-t-use-strstr-on-strings-that-are-potent.patch
+Patch010:	0010-subparse-Check-for-NULL-return-of-strchr-when-parsin.patch
+
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
@@ -35,9 +42,14 @@ BuildRequires:  gobject-introspection-devel >= 1.31.1
 BuildRequires:  iso-codes-devel
 
 BuildRequires:  alsa-lib-devel
+%if %{with cdparanoia}
+BuildRequires:  cdparanoia-devel
+%endif
 BuildRequires:  libogg-devel >= 1.0
 BuildRequires:  libtheora-devel >= 1.1
+%if %{with libvisual}
 BuildRequires:  libvisual-devel
+%endif
 BuildRequires:  libvorbis-devel >= 1.0
 BuildRequires:  libXv-devel
 BuildRequires:  orc-devel >= 0.4.18
@@ -122,26 +134,30 @@ for the GStreamer Base Plugins library.
 
 %prep
 %setup -q -n gst-plugins-base-%{version}
-%patch0 -p3
-%patch1 -p3
-%patch2 -p3
-%patch3 -p3
-%patch4 -p3
-%patch5 -p3
-%patch6 -p3
-%patch7 -p3
+%patch -P 0 -p3
+%patch -P 1 -p1
+%patch -P 2 -p3
+%patch -P 3 -p3
+%patch -P 4 -p3
+%patch -P 5 -p3
+%patch -P 6 -p3
+%patch -P 7 -p3
+%patch -P 8 -p3
+%patch -P 9 -p3
+%patch -P 10 -p3
 
 %build
 %meson \
   -D package-name='Fedora GStreamer-plugins-base package' \
   -D package-origin='http://download.fedoraproject.org' \
   -D gl_winsys=wayland,x11,gbm \
+  %{!?with_cdparanoia:-D cdparanoia=disabled} \
+  %{!?with_libvisual:-D libvisual=disabled} \
   -D doc=disabled \
   -D orc=enabled \
   -D tremor=disabled \
   -D tests=disabled \
-  -D examples=disabled \
-  -D cdparanoia=disabled
+  -D examples=disabled
 %meson_build
 
 %install
@@ -212,12 +228,17 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstapp.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstencoding.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstrawparse.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstplayback.so
+%if %{with cdparanoia}
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstcdparanoia.so
+%endif
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgstriff-1.0.so.*
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstxvimagesink.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgsttheora.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgsttypefindfunctions.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstaudioresample.so
+%if %{with libvisual}
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
+%endif
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstaudioconvert.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstvideoconvertscale.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/gstreamer-%{majorminor}/libgstvideorate.so
@@ -288,8 +309,13 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 
 # base plugins with dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstalsa.so
+%if %{with cdparanoia}
+%{_libdir}/gstreamer-%{majorminor}/libgstcdparanoia.so
+%endif
 %{_libdir}/gstreamer-%{majorminor}/libgstopengl.so
+%if %{with libvisual}
 %{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
+%endif
 %{_libdir}/gstreamer-%{majorminor}/libgstogg.so
 %{_libdir}/gstreamer-%{majorminor}/libgstopus.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpango.so
@@ -494,33 +520,104 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
-* Mon Dec 16 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.1-3
-- Fixes for CVE-2024-47538, CVE-2024-47607, CVE-2024-47615
-  Resolves: RHEL-70979, RHEL-71015, RHEL-70991
+* Fri Dec 13 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.12-4
+- Bump version
+- Apply patches for CVE-2024-47538, CVE-2024-47541, CVE-2024-47542,
+  CVE-2024-47600, CVE-2024-47607, CVE-2024-47615, CVE-2024-47835
+  Resolves: RHEL-70983, RHEL-71035, RHEL-70932, RHEL-71037
+  Resolves: RHEL-71019, RHEL-70995, RHEL-71163
 
-* Wed Jan 17 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.1-2
-- CVE-2023-37328: heap overwrite in subtitle parsing
-- Resolves: RHEL-19475
+* Sat Nov 09 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.12-3
+- Rebuild
+- Resolves: RHEL-38511, RHEL-41157
 
-* Wed Apr 12 2021 Wim Taymans <wtaymans@redhat.com> - 1.22.1-1
+* Fri Nov 08 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.12-2
+- Rebuild
+- Resolves: RHEL-38511, RHEL-41157
+
+* Fri Jun 14 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.12-1
+- Update to 1.22.12
+
+* Thu May 02 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.9-2
+- Disable libvisual in RHEL builds
+
+* Thu Jan 25 2024 Gwyn Ciesla <gwync@protonmail.com> - 1.22.9-1
+- 1.22.9
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Gwyn Ciesla <gwync@protonmail.com> - 1.22.8-1
+- 1.22.8
+
+* Tue Nov 14 2023 Gwyn Ciesla <gwync@protonmail.com> - 1.22.7-1
+- 1.22.7
+
+* Fri Jul 21 2023 Wim Taymans <wtaymans@redhat.com> - 1.22.5-1
+- Update to 1.22.5
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 08 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.22.3-2
+- Disable cdparanoia in RHEL builds
+
+* Thu May 25 2023 Wim Taymans <wtaymans@redhat.com> - 1.22.3-1
+- Update to 1.22.3
+
+* Thu Apr 13 2023 Wim Taymans <wtaymans@redhat.com> - 1.22.2-1
+- Update to 1.22.2
+
+* Mon Mar 13 2023 Wim Taymans <wtaymans@redhat.com> - 1.22.1-1
 - Update to 1.22.1
-- Resolves: rhbz#2144557
 
-* Fri Jan 14 2022 Wim Taymans <wtaymans@redhat.com> - 1.18.4-5
-- Handle both compressed and uncompressed man pages
-- Fix build with small patch
-- Resolves: rhbz#2005247
+* Tue Jan 24 2023 Wim Taymans <wtaymans@redhat.com> - 1.22.0-1
+- Update to 1.22.0
 
-* Mon Aug 09 2021 Mohan Boddu <mboddu@redhat.com> - 1.18.4-4
-- Rebuilt for IMA sigs, glibc 2.34, aarch64 flags
-  Related: rhbz#1991688
+* Fri Jan 20 2023 Wim Taymans <wtaymans@redhat.com> - 1.21.90-1
+- Update to 1.21.90
 
-* Thu Jul 15 2021 Jiri Kucera <jkucera@redhat.com> - 1.18.4-3
-- Remove cdparanoia dependency on el9 and later
-- Resolves: rhbz#1973678
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.20.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
-* Fri Apr 16 2021 Mohan Boddu <mboddu@redhat.com> - 1.18.4-2
-- Rebuilt for RHEL 9 BETA on Apr 15th 2021. Related: rhbz#1947937
+* Wed Jan 11 2023 Wim Taymans <wtaymans@redhat.com> - 1.20.5-1
+- Update to 1.20.5
+
+* Thu Oct 13 2022 Wim Taymans <wtaymans@redhat.com> - 1.20.4-1
+- Update to 1.20.4
+
+* Tue Sep 27 2022 Erico Nunes <ernunes@redhat.com> - 1.20.3-3
+- Enable gbm winsys
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.20.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jul 18 2022 Wim Taymans <wtaymans@redhat.com> - 1.20.3-1
+- Update to 1.20.3
+
+* Fri Feb 4 2022 Wim Taymans <wtaymans@redhat.com> - 1.20.0-1
+- Update to 1.20.0
+
+* Wed Jan 26 2022 Wim Taymans <wtaymans@redhat.com> - 1.19.3-3
+- Fix build, gtk_doc does not exist anymore.
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.19.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Nov 11 2021 Wim Taymans <wtaymans@redhat.com> - 1.19.3-1
+- Update to 1.19.3
+
+* Thu Sep 23 2021 Wim Taymans <wtaymans@redhat.com> - 1.19.2-1
+- Update to 1.19.2
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.19.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Wim Taymans <wtaymans@redhat.com> - 1.19.1-1
+- Update to 1.19.1
 
 * Tue Mar 16 2021 Wim Taymans <wtaymans@redhat.com> - 1.18.4-1
 - Update to 1.18.4

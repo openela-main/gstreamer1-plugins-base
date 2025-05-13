@@ -1,7 +1,7 @@
-From 99cc78f36aa11642e88cad83a9f0a068c91532eb Mon Sep 17 00:00:00 2001
+From 6b757bd74b49cbcdabea2a87449038314ce926f9 Mon Sep 17 00:00:00 2001
 From: Mathieu Duponchelle <mathieu@centricular.com>
 Date: Wed, 2 Oct 2024 15:16:30 +0200
-Subject: [PATCH 7/8] vorbis_parse: check writes to
+Subject: [PATCH 04/10] vorbis_parse: check writes to
  GstOggStream.vorbis_mode_sizes
 
 Thanks to Antonio Morales for finding and reporting the issue.
