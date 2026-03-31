@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.24.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -21,7 +21,8 @@ Source0:        gst-plugins-base-%{version}.tar.xz
 %else
 Source0:        http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-%{version}.tar.xz
 %endif
-Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
+Patch000:       0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
+Patch001:       0001-riff-Correctly-check-that-enough-RGB-palette-data-is.patch
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
@@ -123,6 +124,7 @@ for the GStreamer Base Plugins library.
 %prep
 %setup -q -n gst-plugins-base-%{version}
 %patch -P 0 -p1
+%patch -P 1 -p3
 
 %build
 %meson \
@@ -504,6 +506,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Mon Mar 30 2025 Wim Taymans <wtaymans@redhat.com> - 1.24.11-2
+- Apply patch for CVE-2026-2921
+  Resolves: RHEL-156120
+
 * Tue Jan 14 2025 Wim Taymans <wtaymans@redhat.com> - 1.24.11-1
 - Update to 1.24.11
   Resolves: RHEL-73675
