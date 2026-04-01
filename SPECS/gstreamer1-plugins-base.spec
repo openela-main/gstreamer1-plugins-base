@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.22.12
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -32,6 +32,7 @@ Patch007:	0007-vorbisdec-Set-at-most-64-channels-to-NONE-position.patch
 Patch008:	0008-ssaparse-Search-for-closing-brace-after-opening-brac.patch
 Patch009:	0009-ssaparse-Don-t-use-strstr-on-strings-that-are-potent.patch
 Patch010:	0010-subparse-Check-for-NULL-return-of-strchr-when-parsin.patch
+Patch011:       0001-riff-Correctly-check-that-enough-RGB-palette-data-is.patch
 
 
 BuildRequires:  meson >= 0.48.0
@@ -145,6 +146,7 @@ for the GStreamer Base Plugins library.
 %patch -P 8 -p3
 %patch -P 9 -p3
 %patch -P 10 -p3
+%patch -P 11 -p3
 
 %build
 %meson \
@@ -520,6 +522,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Tue Mar 31 2026 Wim Taymans <wtaymans@redhat.com> - 1.22.12-5
+- Apply patch for CVE-2026-2921
+  Resolves: RHEL-156241
+
 * Fri Dec 13 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.12-4
 - Bump version
 - Apply patches for CVE-2024-47538, CVE-2024-47541, CVE-2024-47542,
