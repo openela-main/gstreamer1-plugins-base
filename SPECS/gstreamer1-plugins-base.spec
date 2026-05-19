@@ -8,7 +8,7 @@
 #global shortcommit %(c=%{gitcommit}; echo ${c:0:5})
 
 Name:           gstreamer1-plugins-base
-Version:        1.24.11
+Version:        1.26.7
 Release:        2%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
@@ -21,12 +21,14 @@ Source0:        gst-plugins-base-%{version}.tar.xz
 %else
 Source0:        http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-%{version}.tar.xz
 %endif
-Patch000:       0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
-Patch001:       0001-riff-Correctly-check-that-enough-RGB-palette-data-is.patch
+Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
+
+Patch1:         0001-riff-Correctly-check-that-enough-RGB-palette-data-is.patch
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
+BuildRequires:  libatomic
 BuildRequires:  gstreamer1-devel >= %{version}
 BuildRequires:  gobject-introspection-devel >= 1.31.1
 BuildRequires:  iso-codes-devel
@@ -506,9 +508,17 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
-* Mon Mar 30 2025 Wim Taymans <wtaymans@redhat.com> - 1.24.11-2
-- Apply patch for CVE-2026-2921
-  Resolves: RHEL-156120
+* Tue Mar 31 2025 Wim Taymans <wtaymans@redhat.com> - 1.26.7-2
+- Add patch for CVE-2026-2921
+  Resolves: RHEL-156122
+
+* Mon Nov 03 2025 Wim Taymans <wtaymans@redhat.com> - 1.26.7-1
+- Update to 1.26.7
+  Resolves: DESKTOP-2922
+
+* Tue Jun 17 2025 Wim Taymans <wtaymans@redhat.com> - 1.26.2-1
+- Update to 1.26.2
+  Resolves: DESKTOP-1858
 
 * Tue Jan 14 2025 Wim Taymans <wtaymans@redhat.com> - 1.24.11-1
 - Update to 1.24.11

@@ -1,4 +1,4 @@
-From 9ed23ad51f1da683dcd5a0646b0b9e76e12f41de Mon Sep 17 00:00:00 2001
+From e59ed136f679ee941e174080d282aca3f5959700 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
 Date: Wed, 11 Feb 2026 19:44:34 +0200
 Subject: [PATCH] riff: Correctly check that enough RGB palette data is
@@ -16,10 +16,10 @@ Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/10
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/subprojects/gst-plugins-base/gst-libs/gst/riff/riff-media.c b/subprojects/gst-plugins-base/gst-libs/gst/riff/riff-media.c
-index 74f99d6ad1..df4c4f09b0 100644
+index 870a33ae12..5003fea58b 100644
 --- a/subprojects/gst-plugins-base/gst-libs/gst/riff/riff-media.c
 +++ b/subprojects/gst-plugins-base/gst-libs/gst/riff/riff-media.c
-@@ -994,7 +994,7 @@ gst_riff_create_video_caps (guint32 codec_fcc,
+@@ -1021,7 +1021,7 @@ gst_riff_create_video_caps (guint32 codec_fcc,
    if (palette) {
      GstBuffer *copy;
      guint num_colors;
@@ -28,7 +28,7 @@ index 74f99d6ad1..df4c4f09b0 100644
  
      if (strf != NULL)
        num_colors = strf->num_colors;
-@@ -1003,7 +1003,9 @@ gst_riff_create_video_caps (guint32 codec_fcc,
+@@ -1030,7 +1030,9 @@ gst_riff_create_video_caps (guint32 codec_fcc,
  
      size = gst_buffer_get_size (palette);
  
