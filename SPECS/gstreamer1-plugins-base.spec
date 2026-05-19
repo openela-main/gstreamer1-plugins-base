@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.22.12
-Release:        5%{?dist}
+Release:        8%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -522,9 +522,19 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
-* Tue Mar 31 2026 Wim Taymans <wtaymans@redhat.com> - 1.22.12-5
+* Wed Apr 01 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-8
+- Rebuild again -7 was build in wrong target
+
+* Tue Mar 31 2026 Veronika Kabatova <vkabatov@redhat.com> - 1.22.12-7
+- Rebuild to fix missing binaries due to buildsystem oversight
+
+* Mon Mar 30 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-6
+- Rebuild for z-stream
+  Resolves: RHEL-156272, RHEL-156273
+
+* Fri Mar 27 2026 Wim Taymans <wtaymans@redhat.com> - 1.22.12-5
 - Apply patch for CVE-2026-2921
-  Resolves: RHEL-156241
+  Resolves: RHEL-156249
 
 * Fri Dec 13 2024 Wim Taymans <wtaymans@redhat.com> - 1.22.12-4
 - Bump version
