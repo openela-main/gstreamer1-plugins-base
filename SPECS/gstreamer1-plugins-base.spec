@@ -6,7 +6,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.16.1
-Release:        6%{?gitcommit:.git%{shortcommit}}%{?dist}
+Release:        6%{?gitcommit:.git%{shortcommit}}%{?dist}.1
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPLv2+
@@ -27,6 +27,9 @@ Patch5:		0006-opusdec-Set-at-most-64-channels-to-NONE-position.patch
 Patch6:		0007-vorbis_parse-check-writes-to-GstOggStream.vorbis_mod.patch
 Patch7:		0008-vorbisdec-Set-at-most-64-channels-to-NONE-position.patch
 Patch8:         0001-riff-Correctly-check-that-enough-RGB-palette-data-is.patch
+# https://issues.redhat.com/browse/RHEL-246576
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12044
+Patch9:		gstreamer1-plugins-base-1.16.1-CVE-2026-18297.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  gstreamer1-devel >= %{version}
@@ -130,6 +133,7 @@ for the GStreamer Base Plugins library.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 %build
 # die rpath (method of modifying libtool fails here)
@@ -497,6 +501,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 
 
 %changelog
+* Tue Aug 25 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.16.1-6.1
+- Add patch for CVE-2026-18297
+  Resolves: RHEL-246576
+
 * Tue Mar 31 2026 Wim Taymans <wtaymans@redhat.com> - 1.16.1-6
 - Add patch for CVE-2026-2921
   Resolves: RHEL-156169
