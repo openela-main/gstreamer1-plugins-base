@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.22.12
-Release:        8%{?dist}
+Release:        8%{?dist}.2
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -33,6 +33,12 @@ Patch008:	0008-ssaparse-Search-for-closing-brace-after-opening-brac.patch
 Patch009:	0009-ssaparse-Don-t-use-strstr-on-strings-that-are-potent.patch
 Patch010:	0010-subparse-Check-for-NULL-return-of-strchr-when-parsin.patch
 Patch011:       0001-riff-Correctly-check-that-enough-RGB-palette-data-is.patch
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12044
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/178ae5ac20db75e56d65e4c4bc142bb234387807
+Patch012:	0001-opusdec-Don-t-use-any-channel-positions-for-64-chann.patch
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12430
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/633eae4c7c4b25b9043372a8a91cf7a386d5168b
+Patch013:	0002-rtsp-message-fix-crash-when-an-auth-value-started-with.patch
 
 
 BuildRequires:  meson >= 0.48.0
@@ -147,6 +153,8 @@ for the GStreamer Base Plugins library.
 %patch -P 9 -p3
 %patch -P 10 -p3
 %patch -P 11 -p3
+%patch -P 12 -p3
+%patch -P 13 -p3
 
 %build
 %meson \
@@ -522,6 +530,17 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Thu Sep 17 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-8.2
+- Fix CVE-2026-18297: opusdec channel position bounds check
+  Resolves: RHEL-246587
+- Fix crash in RTSP auth credential parsing (CVE-2026-85150)
+  Resolves: RHEL-253753
+
+* Wed Jul 08 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-8.1
+- Sync with c9s release -5..-8: fix for CVE-2026-2921 in riff palette
+  parsing
+  Resolves: RHEL-156246
+
 * Wed Apr 01 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-8
 - Rebuild again -7 was build in wrong target
 
