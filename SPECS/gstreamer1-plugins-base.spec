@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.26.7
-Release:        2%{?dist}.2
+Release:        4%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -25,12 +25,12 @@ Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch
 
 Patch1:         0001-riff-Correctly-check-that-enough-RGB-palette-data-is.patch
 
-# https://issues.redhat.com/browse/RHEL-246574
-# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/178ae5ac20db75e56d65e4c4bc142bb234387807
+# https://issues.redhat.com/browse/RHEL-246578
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12044
 Patch2:         gstreamer1-plugins-base-1.26.7-CVE-2026-18297.patch
 
-# https://issues.redhat.com/browse/RHEL-253746
-# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/633eae4c7c4b25b9043372a8a91cf7a386d5168b
+# https://issues.redhat.com/browse/RHEL-253747
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12430
 Patch3:         gstreamer1-plugins-base-1.26.7-CVE-2026-85150.patch
 
 BuildRequires:  meson >= 0.48.0
@@ -518,17 +518,17 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
-* Wed Sep 09 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-2.2
-- Fix crash in RTSP auth credential parsing (CVE-2026-85150)
-  Resolves: RHEL-253746
+* Thu Sep 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-4
+- Add patch for CVE-2026-85150
+  Resolves: RHEL-253747
 
-* Sat Aug 22 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-2.1
+* Tue Aug 25 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-3
 - Add patch for CVE-2026-18297
-  Resolves: RHEL-246574
+  Resolves: RHEL-246578
 
 * Tue Mar 31 2025 Wim Taymans <wtaymans@redhat.com> - 1.26.7-2
 - Add patch for CVE-2026-2921
-  Resolves: RHEL-156122
+  Resolves: RHEL-156137
 
 * Mon Nov 03 2025 Wim Taymans <wtaymans@redhat.com> - 1.26.7-1
 - Update to 1.26.7
