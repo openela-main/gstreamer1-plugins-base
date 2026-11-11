@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.26.7
-Release:        4%{?dist}
+Release:        4%{?dist}.1
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -32,6 +32,10 @@ Patch2:         gstreamer1-plugins-base-1.26.7-CVE-2026-18297.patch
 # https://issues.redhat.com/browse/RHEL-253747
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12430
 Patch3:         gstreamer1-plugins-base-1.26.7-CVE-2026-85150.patch
+
+# https://issues.redhat.com/browse/RHEL-282521
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12652
+Patch4:         gstreamer1-plugins-base-1.26.7-CVE-2026-86476.patch
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
@@ -137,6 +141,7 @@ for the GStreamer Base Plugins library.
 %patch -P 1 -p3
 %patch -P 2 -p1
 %patch -P 3 -p1
+%patch -P 4 -p1
 
 %build
 %meson \
@@ -518,6 +523,12 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Thu Oct 15 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-4.1
+- CVE-2026-86476 gstreamer1-plugins-base: gst-plugins-base: heap buffer overflow via unvalidated GstVideoMeta plane extents in gst_video_frame_map_id and video_meta_deserialize
+  overflow via unvalidated GstVideoMeta plane extents in
+  gst_video_frame_map_id and video_meta_deserialize
+  Resolves: RHEL-282521
+
 * Thu Sep 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-4
 - Add patch for CVE-2026-85150
   Resolves: RHEL-253747
