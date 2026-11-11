@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.26.7
-Release:        4%{?dist}.1
+Release:        4%{?dist}.2
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -36,6 +36,12 @@ Patch3:         gstreamer1-plugins-base-1.26.7-CVE-2026-85150.patch
 # https://issues.redhat.com/browse/RHEL-282521
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12652
 Patch4:         gstreamer1-plugins-base-1.26.7-CVE-2026-86476.patch
+
+# https://issues.redhat.com/browse/RHEL-304279
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/add18b35b21a740c44443f345f5d7618965994bc
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/f70f91d8639080a4aaee2bb7f6481894bca9da15
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/2b878cc896aa9f61d216a3378fe189310f5b0375
+Patch5:         gstreamer1-plugins-base-1.26.7-CVE-2026-125712.patch
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
@@ -142,6 +148,7 @@ for the GStreamer Base Plugins library.
 %patch -P 2 -p1
 %patch -P 3 -p1
 %patch -P 4 -p1
+%patch -P 5 -p1
 
 %build
 %meson \
@@ -523,6 +530,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
+* Tue Nov 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-4.2
+- CVE-2026-125712 gstreamer1-plugins-base: gst-plugins-base: Missing bounds checks in RTCP SDES packet parsing
+  Resolves: RHEL-304279
+
 * Thu Oct 15 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.26.7-4.1
 - CVE-2026-86476 gstreamer1-plugins-base: gst-plugins-base: heap buffer overflow via unvalidated GstVideoMeta plane extents in gst_video_frame_map_id and video_meta_deserialize
   overflow via unvalidated GstVideoMeta plane extents in
