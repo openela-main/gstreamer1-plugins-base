@@ -6,7 +6,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.16.1
-Release:        7%{?gitcommit:.git%{shortcommit}}%{?dist}
+Release:        8%{?gitcommit:.git%{shortcommit}}%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPLv2+
@@ -33,6 +33,11 @@ Patch9:		gstreamer1-plugins-base-1.16.1-CVE-2026-18297.patch
 # https://issues.redhat.com/browse/RHEL-253741
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/633eae4c7c4b25b9043372a8a91cf7a386d5168b
 Patch10:	gstreamer1-plugins-base-1.16.1-CVE-2026-85150.patch
+# https://issues.redhat.com/browse/RHEL-304269
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/99fde1184fe8b12d0721230941c1bf2080913183
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/d9a8586701309d3c453156f12a072c7cdaad964f
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/2b878cc896aa9f61d216a3378fe189310f5b0375
+Patch11:	gstreamer1-plugins-base-1.16.1-CVE-2026-125712.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  gstreamer1-devel >= %{version}
@@ -138,6 +143,7 @@ for the GStreamer Base Plugins library.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 %build
 # die rpath (method of modifying libtool fails here)
@@ -505,6 +511,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 
 
 %changelog
+* Tue Nov 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.16.1-8
+- CVE-2026-125712 gstreamer1-plugins-base: gst-plugins-base: Missing bounds checks in RTCP SDES packet parsing
+  Resolves: RHEL-304269
+
 * Wed Sep 09 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.16.1-7
 - Add patch for CVE-2026-85150
   Resolves: RHEL-253741
