@@ -9,7 +9,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.22.12
-Release:        8%{?dist}.2
+Release:        10%{?dist}.1
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -39,6 +39,15 @@ Patch012:	0001-opusdec-Don-t-use-any-channel-positions-for-64-chann.patch
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12430
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/633eae4c7c4b25b9043372a8a91cf7a386d5168b
 Patch013:	0002-rtsp-message-fix-crash-when-an-auth-value-started-with.patch
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/10730
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/99fde1184fe8b12d0721230941c1bf2080913183
+Patch014:	0001-rtcp-Fix-buffer-overread-in-SDES-packet-parsing.patch
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/11791
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/d9a8586701309d3c453156f12a072c7cdaad964f
+Patch015:	0002-rtcpbuffer-Add-some-missing-bounds-checks-when-parsi.patch
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12013
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/2b878cc896aa9f61d216a3378fe189310f5b0375
+Patch016:	0003-rtcpbuffer-Fix-parsing-of-SR-SDES-compound-packet.patch
 
 
 BuildRequires:  meson >= 0.48.0
@@ -155,6 +164,9 @@ for the GStreamer Base Plugins library.
 %patch -P 11 -p3
 %patch -P 12 -p3
 %patch -P 13 -p3
+%patch -P 14 -p3
+%patch -P 15 -p3
+%patch -P 16 -p3
 
 %build
 %meson \
@@ -530,16 +542,16 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %endif
 
 %changelog
-* Thu Sep 17 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-8.2
-- Fix CVE-2026-18297: opusdec channel position bounds check
-  Resolves: RHEL-246587
-- Fix crash in RTSP auth credential parsing (CVE-2026-85150)
-  Resolves: RHEL-253753
+* Tue Nov 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.22.12-10.1
+- CVE-2026-125712 gstreamer1-plugins-base: gst-plugins-base: Missing bounds checks in RTCP SDES packet parsing
+  Resolves: RHEL-304274
 
-* Wed Jul 08 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-8.1
-- Sync with c9s release -5..-8: fix for CVE-2026-2921 in riff palette
-  parsing
-  Resolves: RHEL-156246
+* Thu Sep 17 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-10
+- Fix crash in RTSP auth credential parsing (CVE-2026-85150)
+  Resolves: RHEL-253754
+
+* Tue Aug 25 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.22.12-9
+- Apply patch for CVE-2026-18297
 
 * Wed Apr 01 2026 Tomas Pelka <tpelka@redhat.com> - 1.22.12-8
 - Rebuild again -7 was build in wrong target

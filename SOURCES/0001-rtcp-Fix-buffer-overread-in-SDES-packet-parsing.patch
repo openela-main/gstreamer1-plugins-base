@@ -1,0 +1,143 @@
+From 259d24ab575497fccf20da967c2a7da31c4c771a Mon Sep 17 00:00:00 2001
+From: jeongmin kwak <jeongmin.kwak@lge.com>
+Date: Tue, 3 Feb 2026 07:30:26 +0900
+Subject: [PATCH 1/3] rtcp: Fix buffer overread in SDES packet parsing
+
+Add bounds checking in gst_rtcp_packet_sdes_next_entry() and
+gst_rtcp_packet_sdes_get_entry() to prevent reading beyond packet
+boundaries when parsing malformed SDES items.
+
+Both functions now return FALSE when attempting to read past the
+packet length, preventing potential buffer overread vulnerabilities.
+
+tests: Add regression test for SDES buffer overread vulnerability
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/10730>
+---
+ .../gst-libs/gst/rtp/gstrtcpbuffer.c          | 16 ++++-
+ .../gst-plugins-base/tests/check/libs/rtp.c   | 67 +++++++++++++++++++
+ 2 files changed, 81 insertions(+), 2 deletions(-)
+
+diff --git a/subprojects/gst-plugins-base/gst-libs/gst/rtp/gstrtcpbuffer.c b/subprojects/gst-plugins-base/gst-libs/gst/rtp/gstrtcpbuffer.c
+index dea2a7933d..12d321d4fd 100644
+--- a/subprojects/gst-plugins-base/gst-libs/gst/rtp/gstrtcpbuffer.c
++++ b/subprojects/gst-plugins-base/gst-libs/gst/rtp/gstrtcpbuffer.c
+@@ -1413,12 +1413,16 @@ gst_rtcp_packet_sdes_next_entry (GstRTCPPacket * packet)
+   /* move to entry */
+   offset += packet->entry_offset;
+ 
++  /* don't overrun - check before reading item_len */
++  len = (packet->length << 2);
++  if (offset + 1 >= len)
++    return FALSE;
++
+   item_len = data[offset + 1] + 2;
+   /* skip item */
+   offset += item_len;
+ 
+-  /* don't overrun */
+-  len = (packet->length << 2);
++  /* check again after adding item_len */
+   if (offset >= len)
+     return FALSE;
+ 
+@@ -1468,6 +1472,14 @@ gst_rtcp_packet_sdes_get_entry (GstRTCPPacket * packet,
+   /* move to entry */
+   offset += packet->entry_offset;
+ 
++  /* Warn if potentially accessing out of bounds */
++  guint pkt_len = (packet->length << 2);
++  if (offset + 1 >= pkt_len) {
++    GST_WARNING ("SDES entry offset %u exceeds packet length %u", offset,
++        pkt_len);
++    return FALSE;
++  }
++
+   if (bdata[offset] == 0)
+     return FALSE;
+ 
+diff --git a/subprojects/gst-plugins-base/tests/check/libs/rtp.c b/subprojects/gst-plugins-base/tests/check/libs/rtp.c
+index 7a5a7b646e..f423d0b27f 100644
+--- a/subprojects/gst-plugins-base/tests/check/libs/rtp.c
++++ b/subprojects/gst-plugins-base/tests/check/libs/rtp.c
+@@ -2323,6 +2323,71 @@ GST_START_TEST (test_rtp_buffer_remove_extension_data)
+ 
+ GST_END_TEST;
+ 
++GST_START_TEST (test_sdes_parsing_out_of_bounds)
++{
++  /* Test case for RTCP SDES packet parsing with out-of-bounds access.
++   * This test creates malformed SDES packets that could cause a read
++   * beyond the buffer limits and verifies that the parsing function
++   * correctly identifies the error and returns FALSE. */
++  GstRTCPBuffer rtcp = GST_RTCP_BUFFER_INIT;
++  GstRTCPPacket packet;
++  GstMapInfo map;
++  GstBuffer *buffer;
++  guint8 *data;
++  gboolean ret;
++
++  /* Packet 1: Truncated packet where length field is missing */
++  buffer = gst_buffer_new_and_alloc (4);
++  gst_buffer_map (buffer, &map, GST_MAP_WRITE);
++  data = map.data;
++  /* V=2, P=0, RC=1, PT=202 (SDES), length=0 */
++  GST_WRITE_UINT32_BE (data, 0x81ca0000);
++  gst_buffer_unmap (buffer, &map);
++
++  ret = gst_rtcp_buffer_map (buffer, GST_MAP_READ, &rtcp);
++  fail_unless (ret == TRUE, "Failed to map buffer");
++
++  ret = gst_rtcp_buffer_get_first_packet (&rtcp, &packet);
++  fail_unless (ret == TRUE, "Failed to get first packet");
++
++  /* This should fail because the packet is too short to contain a full SDES item */
++  ret = gst_rtcp_packet_sdes_get_entry (&packet, NULL, NULL, NULL);
++  fail_unless (ret == FALSE,
++      "sdes_get_entry should fail on truncated packet (case 1)");
++
++  gst_rtcp_buffer_unmap (&rtcp);
++  gst_buffer_unref (buffer);
++
++  /* Packet 2: Packet where item length field indicates more data than available */
++  buffer = gst_buffer_new_and_alloc (10);
++  gst_buffer_map (buffer, &map, GST_MAP_WRITE);
++  data = map.data;
++  /* V=2, P=0, RC=1, PT=202 (SDES), length=1 */
++  /* SSRC = 0x12345678 */
++  /* CNAME item, length = 5 (but only 0 bytes of text available) */
++  GST_WRITE_UINT32_BE (data, 0x81ca0001);
++  GST_WRITE_UINT32_BE (data + 4, 0x12345678);
++  data[8] = GST_RTCP_SDES_CNAME;
++  data[9] = 5;                  /* Malformed length */
++  gst_buffer_unmap (buffer, &map);
++
++  ret = gst_rtcp_buffer_map (buffer, GST_MAP_READ, &rtcp);
++  fail_unless (ret == TRUE, "Failed to map buffer");
++
++  ret = gst_rtcp_buffer_get_first_packet (&rtcp, &packet);
++  fail_unless (ret == TRUE, "Failed to get first packet");
++
++  /* This should fail because the item length is out of bounds */
++  ret = gst_rtcp_packet_sdes_get_entry (&packet, NULL, NULL, NULL);
++  fail_unless (ret == FALSE,
++      "sdes_get_entry should fail on out-of-bounds length (case 2)");
++
++  gst_rtcp_buffer_unmap (&rtcp);
++  gst_buffer_unref (buffer);
++}
++
++GST_END_TEST;
++
+ static Suite *
+ rtp_suite (void)
+ {
+@@ -2380,6 +2445,8 @@ rtp_suite (void)
+   tcase_add_test (tc_chain, test_rtp_buffer_remove_extension_data);
+   tcase_add_test (tc_chain, test_rtp_buffer_set_extension_data_shrink_data);
+ 
++  tcase_add_test (tc_chain, test_sdes_parsing_out_of_bounds);
++
+   return s;
+ }
+ 
